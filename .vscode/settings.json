@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "windows.h": "c",
+        "stdio.h": "c",
+        "stdlib.h": "c",
+        "winbase.h": "c",
+        "windef.h": "c",
+        "_mingw.h": "c",
+        "winsvc.h": "c",
+        "winreg.h": "c",
+        "winnetwk.h": "c",
+        "winver.h": "c",
+        "winuser.h": "c",
+        "wingdi.h": "c",
+        "locale.h": "c"
+    }
+}
