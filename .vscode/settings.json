@@ -12,6 +12,8 @@
         "winver.h": "c",
         "winuser.h": "c",
         "wingdi.h": "c",
-        "locale.h": "c"
+        "locale.h": "c",
+        "socket.h": "c",
+        "winsock2.h": "c"
     }
 }

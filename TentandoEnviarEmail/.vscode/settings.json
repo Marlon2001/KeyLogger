@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "para.h": "c",
+        "*": "c",
+        "libssl.h": "c",
+        "string.h": "c",
+        "stdlib.h": "c",
+        "socket.h": "c",
+        "ws2tcpip.h": "c",
+        "winsock2.h": "c",
+        "winsock.h": "c",
+        "base64.h": "c"
+    }
+}
