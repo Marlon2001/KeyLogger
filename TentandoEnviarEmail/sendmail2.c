@@ -142,8 +142,8 @@ int ConnectToServer(const char* server_address){
     struct sockaddr_in addr; // Struct que contem os ip do servidor de email
     memset(&addr, 0, sizeof(addr)); // Copiando o '0' para todos os membros da structure 'addr'
     addr.sin_family=AF_INET; // 'AF_INET" para endereços IPv4
-    addr.sin_port=htons(25); // Porta do 'SMTP'
-    
+    addr.sin_port=htons(465); // Porta do 'SMTP'
+
     // const char* ip = GetIPAddress(smtp_domain_name);
 
     addr.sin_addr.s_addr = inet_addr("182.50.145.3");
