@@ -1,6 +1,6 @@
-#define UID "marlonmln.026@gmail.com"
-#define PWD "Mln@0629012"
-#define domain "localhost"
-#define FROM "marlonmln.026@gmail.com"
-#define TO "marlonnlm.026@gmail.com"
-#define smtp_domain_name "smtpout.asia.secureserver.net"
+#define UID ""
+#define PWD ""
+#define domain ""
+#define FROM ""
+#define TO ""
+#define smtp_address "74.125.141.108" // <-- smtp.gmail.com

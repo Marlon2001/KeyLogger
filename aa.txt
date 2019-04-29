@@ -1,1 +1,0 @@
-gcc sendmail2.c base64.c -o sendmail2.exe -lws2_32
