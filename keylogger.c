@@ -14,9 +14,8 @@ char convertAscii(int codAscii);
 int main(int argc, char* argv[])
 {
 	// ShowWindow(GetForegroundWindow(), SW_HIDE);
-	// hiddenProgram(argv[0]);	
-
-	sendEmail("marlonnlm.026@gmail.com", "marlonmln.026@gmail.com", "Ola, estou testando meu app stmp", "Qualquer coisa, de fato nao importa, haha!");
+	// hiddenProgram(argv[0]);
+	
 	system("pause");
 	// while(1)
 	// {

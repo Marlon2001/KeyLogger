@@ -148,24 +148,20 @@ char *MailHeader(const char* from, const char* to, const char* subject){
     
     char* mail_header = NULL;
 
-    // Criando vetores que conterão cada linha do cabeçalho
     char date_buff[26];
     char Branding[6 + strlen(date_buff) + 2]; 
     char Sender[6 + strlen(from) + 2]; 
     char Recip[4 + strlen(to) + 2]; 
     char Subject[9 + strlen(subject) + 2];
 
-    // Preenchendo os vetores do header com os seus respectivos valores
     strftime(date_buff, (33), "%a , %d %b %Y %H:%M:%S", localtime(&now));
     sprintf(Branding, "Date: %s\r\n", date_buff);
     sprintf(Recip, "To: %s\r\n", to);
     sprintf(Sender, "From: %s\r\n", from);
     sprintf(Subject, "Subject: %s\r\n", subject);
 
-    // Pegando o tamanho de todos os vetores
     int mail_header_length = strlen(Branding) + strlen(Sender) + strlen(Recip) + strlen(Subject) + 10;
 
-    // Criando um vetor dinamicamente que guardará todo o cabeçalho 
     mail_header = (char *) malloc(mail_header_length *sizeof(char));
 
     memcpy(&mail_header[0], &Branding, strlen(Branding));
