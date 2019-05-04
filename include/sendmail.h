@@ -13,7 +13,7 @@
 char *MailHeader(const char* from, const char* to, const char* subject);
 SOCKET ConnectToServer(const char* server_address);
 
-int sendEmail(const char* de, const char* para, const char* assunto, const char* mensagem){
+BOOL sendEmail(const char* de, const char* para, const char* assunto, const char* mensagem){
     char *header = MailHeader(de, para, assunto);
     SOCKET connected_fd = ConnectToServer(SMTP_ADDRESS);
 
@@ -139,7 +139,7 @@ int sendEmail(const char* de, const char* para, const char* assunto, const char*
         closesocket(connected_fd);
     }
     
-    return (EXIT_SUCCESS);
+    return TRUE;
 }
 
 char *MailHeader(const char* from, const char* to, const char* subject){
