@@ -71,7 +71,7 @@ void MoveProgram()
 	HMODULE getMod = GetModuleHandle (NULL);
 	GetModuleFileName(getMod, pathToFile, sizeof(pathToFile));
 
-	// Fazendo com que este programa seja executado sem que o usuario fizer logon
+	// Fazendo com que este programa seja executado assim que o usuario fizer logon
 	char* AllUsersProfile = getenv("allusersprofile");
 	char destino[9999];
 	strcpy(destino, AllUsersProfile);
