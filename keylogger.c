@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 	// Se mesmo pedindo permissão de administrador o usuario não concede-la, sair do programa
 	if (!IsCurrentUserLocalAdministrator())
 		exit(1);
-		
+
 	while(TRUE){
 		// KeyLogger();
 		// Sleep(1);
@@ -272,12 +272,14 @@ BOOL IsCurrentUserLocalAdministrator(void)
 		GenericMapping.GenericExecute = 0;
 		GenericMapping.GenericAll     = ACCESS_READ | ACCESS_WRITE;
 
+		// Verificando se este programa possui permissoes administrativas
 		if (!AccessCheck(psdAdmin, hImpersonationToken, dwAccessDesired, &GenericMapping, &ps, &dwStructureSize, &dwStatus, &fReturn)) {
 			fReturn = FALSE;
 			return FALSE;
 		}
 	}
 
+	// Liberando as variaveis da memoria
 	if (pACL) LocalFree(pACL);
 	if (psdAdmin) LocalFree(psdAdmin);
 	if (psidAdmin) FreeSid(psidAdmin);
