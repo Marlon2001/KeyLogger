@@ -18,7 +18,7 @@ void MoveProgram();
 void ConvertToChar(int, FILE *);
 BOOL ProtectProcess();
 BOOL EnablePriv (const char *);
-BOOL IsCurrentUserLocalAdministrator(void);
+BOOL IsCurrentUserLocalAdministrator();
 
 int main(int argc, char* argv[])
 {
@@ -201,7 +201,7 @@ BOOL EnablePriv (const char *szPriv)
 }
 
 <<<<<<< HEAD
-BOOL IsCurrentUserLocalAdministrator(void)
+BOOL IsCurrentUserLocalAdministrator()
 {
 	BOOL   fReturn         = FALSE;
 	DWORD  dwStatus;
