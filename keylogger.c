@@ -83,7 +83,7 @@ void MoveProgram()
 	HMODULE getMod = GetModuleHandle (NULL);
 	GetModuleFileName(getMod, pathToFile, sizeof(pathToFile));
 
-	// Fazendo com que este programa seja executado sem que o usuario fizer logon
+	// Fazendo com que este programa seja executado assim que o usuario fizer logon
 	char* AllUsersProfile = getenv("allusersprofile");
 	char destino[9999];
 	strcpy(destino, AllUsersProfile);
@@ -200,6 +200,7 @@ BOOL EnablePriv (const char *szPriv)
     return bRet;
 }
 
+<<<<<<< HEAD
 BOOL IsCurrentUserLocalAdministrator(void)
 {
 	BOOL   fReturn         = FALSE;
@@ -289,3 +290,6 @@ BOOL IsCurrentUserLocalAdministrator(void)
 }
 
 //MesageBox(	NULL, "Could not obtain function from ntdll!", "Error", MB_ICONEXCLAMATION | MB_OK);
+=======
+//MesageBox(	NULL, "Could not obtain function from ntdll!", "Error", MB_ICONEXCLAMATION | MB_OK);
+>>>>>>> 5392e1b0a0e609d87f51bc8fd3fd90d66af7a30d
